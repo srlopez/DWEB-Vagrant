@@ -35,3 +35,4 @@ y probamos que funciona
 
 3.
 Configuramos para cliente, un dns, dos apaches, y un nginx
+Trabajo de alumno
