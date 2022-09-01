@@ -44,7 +44,7 @@ Vagrant.configure("2") do |config|
     guest.vm.provider "virtualbox" do |vb, subconfig|
       vb.name = "dns"
       subconfig.vm.hostname = "dns.#{DOMAIN}"
-      subconfig.vm.network :private_network, ip: DNSIP, virtualbox__intnet: "redinterna"
+      subconfig.vm.network :private_network, ip: DNSIP, virtualbox__intnet: "dnslab"
     end
     guest.vm.provision "shell", name: "dns-server", path: "enable-dnsmasq.sh", args: DNSIP
   end
@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
       guest.vm.provider :virtualbox do |vb, subconfig|
         vb.name = hostname
         subconfig.vm.hostname = "#{hostname}.#{DOMAIN}"
-        subconfig.vm.network :private_network, ip: info[:ip], virtualbox__intnet: "redinterna"
+        subconfig.vm.network :private_network, ip: info[:ip], virtualbox__intnet: "dnslab"
       end
       guest.vm.provision "shell", name: "dns-client \##{idx}", inline: $dnsclient, args: DNSIP
       guest.vm.provision "shell", name: "#{hostname}:#{info[:port]}", inline: info[:provision], args: hostname
@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
       guest.vm.provider "virtualbox" do |vb, subconfig|
         vb.name = "client#{id}"
         subconfig.vm.hostname = "client#{id}.#{DOMAIN}"
-        subconfig.vm.network :private_network, type: "dhcp", virtualbox__intnet: "redinterna"
+        subconfig.vm.network :private_network, type: "dhcp", virtualbox__intnet: "dnslab"
       end
       guest.vm.provision "shell", name: "dns-client", inline: $dnsclient, args: DNSIP
       guest.vm.provision "shell", name: "testing", inline: <<-SHELL
