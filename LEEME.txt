@@ -1,5 +1,5 @@
 GUION DE TRABAJO
-1.
+1. vagrant
 Inicializamos con 
 
 vagrant init ubuntu/focal64
@@ -24,15 +24,66 @@ snapshot push, snapshot restore
 
 https://gist.github.com/wpscholar/a49594e2e2b918f4d0c4
 
-2.
+2. Ruby 
+Variables
+IP = "192.168.56.100"
+
+$dnsclient = <<-SHELL
+  apt-get update
+  systemctl disable --now systemd-resolved
+  systemctl stop systemd-resolved
+  echo -e "nameserver $1">/etc/resolv.conf
+SHELL
+
+Listas y Hash (Diccionarios)
+maquinas = ["UNO", "DOS", "TRES"]
+equipos = {
+  "uno"  => { :ip => "192.168.56.10",  :hostname=> "EquipoA" },
+  "dos"  => { :ip => "192.168.56.11",  :hostname=> "EquipoB" },
+  "tres" => { :ip => "192.168.56.12",  :hostname=> "EquipoC" },
+}
+data1 = equipos["uno"]
+ip = data1[:ip]
+
+Ciclos 
+equipos.each do |(key, info)|
+equipos.each_with_index do |(key, info), idx|
+    puts idx
+    puts key
+    puts info[:ip]
+end
+
+Interpolacion de strings
+DOMAIN="aula104"
+HOSTNAME="dns.#{DOMAIN}"
+
+3. Vagrant
 Preparamos el script para
-- nombrar la máquina virtual y asignarla a un grupo
-- establecer la mem,cpu
-- establecer la ip, y el hostname
-- instalar apache ¿?
+- configuración general de cada maquina la mem,cpu y asignarla a un grupo
+  config.vm.provider "virtualbox" do |vb|
+    vb.cpus = 1
+    vb.memory = 1024
+    vb.customize ["modifyvm", :id, "--groups", "/DNSLAB"]
+  end
+- nombrar la máquina virtual, establecer la ip, y el hostname
+
+ config.vm.define :mimaquina do |guest|
+    guest.vm.provider "virtualbox" do |vb, subconfig|
+      vb.name = "mimaquina"
+      subconfig.vm.hostname = "mimaquina"
+      subconfig.vm.network :private_network, ip: 192.168.100.1, virtualbox__intnet: "milab"
+    end
+  end
+- ejecuacion scripts shell
+    guest.vm.provision "shell", name: "name shell", path: "path_to_commands.sh", args: PARAM1
+    guest.vm.provision "shell", name: "opcional", inline: $dnsclient, args: MIPARAM
+
+- Port forwading
+    guest.vm.network "forwarded_port", guest: 80, host: 8080
+
 
 y probamos que funciona
 
-3.
+4. 
 Configuramos para cliente, un dns, dos apaches, y un nginx
 Trabajo de alumno

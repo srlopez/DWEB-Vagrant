@@ -78,6 +78,7 @@ Vagrant.configure("2") do |config|
         curl apache1 --no-progress-meter 
         curl apache2 --no-progress-meter 
         curl nginx --no-progress-meter 
+        ping -a -c 1 amazon.com
       SHELL
     end
   end

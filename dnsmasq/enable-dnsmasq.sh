@@ -2,7 +2,7 @@ DNSIP=$1
 apt-get update
 systemctl disable --now systemd-resolved
 systemctl stop systemd-resolved
-
+ 
 cp /etc/resolv.conf{,.bak}
 cat <<EOF >/etc/resolv.conf
 nameserver 127.0.0.1
