@@ -1,28 +1,11 @@
 GUION DE TRABAJO
 1. vagrant
-Inicializamos con 
-
-vagrant init ubuntu/focal64
-vagrant box update
-vagrant box list
-
-Vemos lo que contiene Vagrantfile, luego editamos el archivo y 
-
-vagrant up
-vagrant ssh
-
-vemos que compartimos el directorio..., la ip, el tipo de red que nos asigna, etc...
-
-vagrant halt
-vagrant destroy
-vagrant suspend
-vagrant resume
+https://docs.google.com/document/d/1y8Dsjl1CHolYP_boMN9U-6X0gTkcwU8nAihCVMyLOVE/edit?usp=sharing
 
 =====
 share, reload, provision
 snapshot push, snapshot restore
 
-https://gist.github.com/wpscholar/a49594e2e2b918f4d0c4
 
 2. Ruby 
 Variables
@@ -74,7 +57,7 @@ Preparamos el script para
       subconfig.vm.network :private_network, ip: 192.168.100.1, virtualbox__intnet: "milab"
     end
   end
-- ejecuacion scripts shell
+- ejecución scripts shell
     guest.vm.provision "shell", name: "name shell", path: "path_to_commands.sh", args: PARAM1
     guest.vm.provision "shell", name: "opcional", inline: $dnsclient, args: MIPARAM
 
