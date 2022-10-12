@@ -33,7 +33,7 @@ EOF
 
 cat <<EOF >/etc/hosts
 127.0.0.1	    localhost
-$DNSIP  dns.aula104     dns
+$DNSIP  dns.aula104     dns ns1 ns2
 192.168.56.10   nginx.aula104   nginx
 192.168.56.11   apache1.aula104 apache1
 192.168.56.12   apache2.aula104 apache2
