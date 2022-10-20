@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 BOX_IMAGE = "ubuntu/focal64"
 VBLAB = "bind9"
-VBFOLDER = "/DNSVBLAB9"
+VBFOLDER = "/DNSLAB9"
 
 DOMAIN = "aula104.local"
 RED = "192.168.1"
