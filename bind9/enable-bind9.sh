@@ -1,7 +1,12 @@
-DNSIP=$1
-DIR=$(echo $1 | cut -d '.' -f-3)
-REV=$(echo $1 | tac -s. | tail -1 | cut -d '.' -f-3)
-ZONA=$2
+DNSIP=$1                                             # 192.168.1.2
+DIR=$(echo $1 | cut -d '.' -f-3)                     # 192.168.1
+REV=$(echo $1 | tac -s. | tail -1 | cut -d '.' -f-3) # 1.168.192
+ZONA=$2                                              # aula104.local
+
+# https://serverfault.com/questions/85161/should-i-use-etc-bind-zones-or-var-cache-bind
+# /var/lib/bind/ - master and dynamic zones
+# /var/cache/bind/ - secondary zones
+# /etc/bind/ - zones that should not change for the lifetime of the server.
 
 apt-get update
 apt-get install -y bind9 bind9utils bind9-doc
@@ -32,36 +37,44 @@ zone "$REV.in-addr.arpa" {
 EOF
 
 cat <<EOF >/var/lib/bind/$ZONA
-\$TTL 3600
+\$TTL 3600      ; Este es el tiempo, en segundos, que un registro de recurso de zona es válido
 $ZONA.     IN      SOA     ns.$ZONA. santi.$ZONA. (
-                3            ; serial
-                7200         ; refresh after 2 hours
-                3600         ; retry after 1 hour
-                604800       ; expire after 1 week
-                86400 )      ; minimum TTL of 1 day
+    3           ; n <serial-number> Un valor incrementado cada vez que se cambia el archivo de zona 
+    7200        ; 2 horas <time-to-refresh> tiempo de espera de un esclavo antes de preguntar al maestro si se han realizado cambios
+    3600        ; 1 hora <time-to-retry>  tiempo de espera antes de emitir una petición de actualización, si el maestro no responda
+    604800      ; 1 semana <time-to-expire> Tiempo que guarda la zona si el servidor maestro no ha respondido 
+    86400 )     ; 1 día <minimum-TTL> Tiempo que otros servidores de nombres guardan en caché la información de zona.
 
-$ZONA.                  IN      NS      ns.$ZONA.
+; Registro NameServer, el cual anuncia los nombres de servidores con autoridad para una zona particular.
+$ZONA.                  IN      NS      ns.$ZONA. ; debe ser un FQDN.
+
+; Registros Address FQDN y no FQDN
 ns.aula104.local.       IN      A       $DNSIP
-ns1.aula104.local.      IN      CNAME   ns
-ns2.aula104.local.      IN      CNAME   ns
+nginx                   IN      A       $DIR.10
 apache1.aula104.local.  IN      A       $DIR.11
 apache2                 IN      A       $DIR.12
+
+; Registros ALIAS FQDN y no FQDN
 sv1                     IN      CNAME   apache1
 sv2                     IN      CNAME   apache2
-nginx                   IN      A       $DIR.10
+ns1.aula104.local.      IN      CNAME   ns
+ns2.aula104.local.      IN      CNAME   ns
 proxy                   IN      CNAME   nginx
-balanceador             IN      CNAME   nginx
+balancer                IN      CNAME   nginx
 EOF
 
 cat <<EOF >/var/lib/bind/$DIR.rev
 \$ttl 3600
 $REV.in-addr.arpa.  IN      SOA     ns.aula104.local. santi.aula104.local. (
-                3            ; serial
-                7200         ; refresh after 2 hours
-                3600         ; retry after 1 hour
-                604800       ; expire after 1 week
-                86400 )      ; minimum TTL of 1 day
+    3
+    7200
+    3600
+    604800
+    86400 )
+; Registros NS
 $REV.in-addr.arpa.  IN      NS      ns.aula104.local.
+
+; Registros PUNTEROS
 100 IN  PTR dns
 10  IN  PTR nginx
 11  IN  PTR apache1

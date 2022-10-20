@@ -7,9 +7,7 @@ LAB = "bind9"
 
 $dnsclient = <<-SHELL
   # apt-get update
-  ## systemctl disable --now systemd-resolved
-  ## systemctl stop systemd-resolved
-  echo -e "nameserver $1\ndomain aula104.local">/etc/resolv.conf
+  echo -i "nameserver $1\ndomain $DOMAIN">/etc/resolv.conf
 SHELL
 
 $apacheserver = <<-SHELL
@@ -65,7 +63,7 @@ Vagrant.configure("2") do |config|
   end
   
   # clients DHCP
-  (1..1).each do |id|
+  (1..2).each do |id|
     config.vm.define "client#{id}" do |guest|
       guest.vm.provider "virtualbox" do |vb, subconfig|
         vb.name = "client#{id}"
@@ -76,15 +74,14 @@ Vagrant.configure("2") do |config|
       end
       guest.vm.provision "shell", name: "dns-client", inline: $dnsclient, args: DNSIP
       guest.vm.provision "shell", name: "testing", inline: <<-SHELL
-        dig google.com +short
-        dig -x 192.168.1.100 +short
-        ping -a -c 1 apache1
-        ping -a -c 1 apache2.aula104.local
-        # curl apache1 --no-progress-meter 
-        # curl apache2 --no-progress-meter 
-        # curl nginx --no-progress-meter 
-        ping -a -c 1 amazon.com
-        ping -a -c 1 ns2
+        dig google.com +short               # valida los forwaders
+        dig -x 192.168.1.100 +short         # valida la resolución inversa
+        ping -a -c 1 apache1                # valida la resolucion no FQDN
+        ping -a -c 1 apache2.aula104.local  # Valida la resolución FQDN
+        curl apache1 --no-progress-meter    # valida apache1 instalado
+        curl apache2 --no-progress-meter    # valida apache2 instalado
+        curl nginx --no-progress-meter      # valida nginx instalado
+        nslookup -debug nginx               # valida la resolucion con nslookup
       SHELL
     end
   end
