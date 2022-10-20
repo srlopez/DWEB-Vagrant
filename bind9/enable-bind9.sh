@@ -1,7 +1,7 @@
 DNSIP=$1
 DIR=$(echo $1 | cut -d '.' -f-3)
 REV=$(echo $1 | tac -s. | tail -1 | cut -d '.' -f-3)
-ZONA="aula104.local"
+ZONA=$2
 
 apt-get update
 apt-get install -y bind9 bind9utils bind9-doc
