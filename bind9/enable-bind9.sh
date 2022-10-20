@@ -12,15 +12,15 @@ apt-get update
 apt-get install -y bind9 bind9utils bind9-doc
  
 cat <<EOF >/etc/bind/named.conf.options
-// acl "allowed" {
-//    $DIR.0/24;
-// };
+acl "allowed" {
+    $DIR.0/24;
+};
 
 options {
     directory "/var/cache/bind";
-    // dnssec-validation auto;  // default
+    dnssec-validation auto;  // default
 
-    // listen-on-v6 { any; };
+    listen-on-v6 { any; };
     forwarders { 1.1.1.1;  1.0.0.1;  };
 };
 EOF
