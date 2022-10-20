@@ -1,13 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 BOX_IMAGE = "ubuntu/focal64"
+VBLAB = "bind9"
+VBFOLDER = "/DNSVBLAB9"
+
 DOMAIN = "aula104.local"
-DNSIP = "192.168.1.100"
-LAB = "bind9"
+RED = "192.168.1"
+DNSIP = "#{RED}.2"
 
 $dnsclient = <<-SHELL
-  # apt-get update
-  echo -i "nameserver $1\ndomain $DOMAIN">/etc/resolv.conf
+  apt-get update
+  echo -i "nameserver $1\ndomain $2">/etc/resolv.conf
 SHELL
 
 $apacheserver = <<-SHELL
@@ -23,9 +26,9 @@ $nginxserver = <<-SHELL
 SHELL
 
 services = {
-  "nginx"   => { :ip => "192.168.1.10", :provision=>$nginxserver, :port=> "8080" },
-  "apache1" => { :ip => "192.168.1.11", :provision=>$apacheserver, :port=> "8081" },
-  "apache2" => { :ip => "192.168.1.12", :provision=>$apacheserver, :port=> "8082" },
+  "nginx"   => { :ip => "#{RED}.10", :provision=>$nginxserver, :port=> "8080" },
+  "apache1" => { :ip => "#{RED}.11", :provision=>$apacheserver, :port=> "8081" },
+  "apache2" => { :ip => "#{RED}.12", :provision=>$apacheserver, :port=> "8082" },
 }
 
 Vagrant.configure("2") do |config|
@@ -35,7 +38,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.cpus = 1
     vb.memory = 1024
-    vb.customize ["modifyvm", :id, "--groups", "/DNSLAB9"]
+    vb.customize ["modifyvm", :id, "--groups", VBFOLDER]
   end
 
   # dns 
@@ -43,7 +46,7 @@ Vagrant.configure("2") do |config|
     guest.vm.provider "virtualbox" do |vb, subconfig|
       vb.name = "dns"
       subconfig.vm.hostname = "dns.#{DOMAIN}"
-      subconfig.vm.network :private_network, ip: DNSIP,  virtualbox__intnet: LAB # ,  name: RED #
+      subconfig.vm.network :private_network, ip: DNSIP,  virtualbox__intnet: VBLAB 
     end
     guest.vm.provision "shell", name: "dns-server", path: "enable-bind9.sh", args: "#{DNSIP} #{DOMAIN}"
   end
@@ -54,9 +57,9 @@ Vagrant.configure("2") do |config|
       guest.vm.provider :virtualbox do |vb, subconfig|
         vb.name = hostname
         subconfig.vm.hostname = "#{hostname}.#{DOMAIN}"
-        subconfig.vm.network :private_network, ip: info[:ip], virtualbox__intnet: LAB
+        subconfig.vm.network :private_network, ip: info[:ip], virtualbox__intnet: VBLAB
       end
-      guest.vm.provision "shell", name: "dns-client \##{idx}", inline: $dnsclient, args: DNSIP
+      guest.vm.provision "shell", name: "dns-client \##{idx}", inline: $dnsclient, args: "#{DNSIP} #{DOMAIN}"
       guest.vm.provision "shell", name: "#{hostname}:#{info[:port]}", inline: info[:provision], args: hostname
       guest.vm.network "forwarded_port", guest: 80, host: info[:port]
     end 
@@ -68,11 +71,12 @@ Vagrant.configure("2") do |config|
       guest.vm.provider "virtualbox" do |vb, subconfig|
         vb.name = "client#{id}"
         subconfig.vm.hostname = "client#{id}.#{DOMAIN}"
-        # subconfig.vm.network :private_network, type: "dhcp", virtualbox__intnet: LAB, name: RED
+        # subconfig.vm.network :private_network, type: "dhcp", virtualbox__intnet: VBLAB, name: RED
         # subconfig.vm.network :private_network, type: "dhcp", name: RED #, ip: "192.168.1.1"
-        subconfig.vm.network :private_network, ip: "192.168.1.#{150+id}",  virtualbox__intnet: LAB
+        # HACER LOS CLIENTES DHCP ¿?
+        subconfig.vm.network :private_network, ip: "192.168.1.#{150+id}",  virtualbox__intnet: VBLAB
       end
-      guest.vm.provision "shell", name: "dns-client", inline: $dnsclient, args: DNSIP
+      guest.vm.provision "shell", name: "dns-client", inline: $dnsclient, args: "#{DNSIP} #{DOMAIN}"
       guest.vm.provision "shell", name: "testing", inline: <<-SHELL
         dig google.com +short               # valida los forwaders
         dig -x 192.168.1.100 +short         # valida la resolución inversa
