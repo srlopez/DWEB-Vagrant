@@ -79,6 +79,7 @@ Vagrant.configure("2") do |config|
           vb.cpus = 2
           vb.memory = 2048
           subconfig.vm.box = BOX_DESKTOP
+          subconfig.vbguest.auto_update = true
         end
         subconfig.vm.hostname = "client#{id}.#{DOMAIN}"
         subconfig.vm.network :private_network, ip: "#{RED}.#{100+id}",  virtualbox__intnet: VBNET
