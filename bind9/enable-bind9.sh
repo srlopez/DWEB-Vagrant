@@ -75,7 +75,7 @@ $REV.in-addr.arpa.  IN      SOA     ns.$ZONA. santi.$ZONA. (
 $REV.in-addr.arpa.  IN      NS      ns.$ZONA.
 
 ; Registros PUNTEROS
-100 IN  PTR dns
+2   IN  PTR dns
 10  IN  PTR nginx
 11  IN  PTR apache1
 12  IN  PTR apache2
