@@ -55,6 +55,8 @@ Preparamos el script para
       vb.name = "mimaquina"
       subconfig.vm.hostname = "mimaquina"
       subconfig.vm.network :private_network, ip: 192.168.100.1, virtualbox__intnet: "milab"
+      # y segunda red
+      subconfig.vm.network :private_network, ip: 192.168.200.1
     end
   end
 - ejecución scripts shell
