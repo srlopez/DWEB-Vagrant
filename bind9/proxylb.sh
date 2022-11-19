@@ -1,7 +1,12 @@
+# Documentación de Forwarded
+# https://codingshower.com/apache-server-get-actual-client-ip-address-behind-proxy-or-load-balancer/
+
 cat <<EOF >/etc/nginx/sites-available/000-default
 # Pasamos la dirección del cliente
 proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 upstream MisBALANCEADOS {
+    # Con propósitos educativos
+    # Los servidores deberían proveer el mismo servico
     server apache1.aula104.local;
     server apache2.aula104.local;
     server sv1;
