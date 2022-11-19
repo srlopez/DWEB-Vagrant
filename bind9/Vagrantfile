@@ -27,9 +27,9 @@ $nginxserver = <<-SHELL
 SHELL
 
 services = {
-  "nginx"   => { :ip => "#{RED}.10", :ip2 => "10.0.0.10", :provision=>$nginxserver,  :port=> "8080" },
-  "apache1" => { :ip => "#{RED}.11", :ip2 => "10.0.0.11",  :provision=>$apacheserver, :port=> "8081" },
-  "apache2" => { :ip => "#{RED}.12", :ip2 => "10.0.0.12",  :provision=>$apacheserver, :port=> "8082" },
+  "nginx"   => { :ip => "#{RED}.10", :ip2 => "10.0.0.10", :install=>$nginxserver, :provision=>"proxylb.sh", :port=> "8080" },
+  "apache1" => { :ip => "#{RED}.11", :ip2 => "10.0.0.11",  :install=>$apacheserver, :provision=>"virtualhosts.sh", :port=> "8081" },
+  "apache2" => { :ip => "#{RED}.12", :ip2 => "10.0.0.12",  :install=>$apacheserver, :provision=>"virtualhosts.sh", :port=> "8082" },
 }
 
 Vagrant.configure("2") do |config|
@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
       subconfig.vm.hostname = "dns.#{DOMAIN}"
       subconfig.vm.network :private_network, ip: DNSIP,  virtualbox__intnet: VBNET 
     end
-    guest.vm.provision "shell", name: "dns-server", path: "enable-bind9.sh", args: "#{DNSIP} #{DOMAIN}"
+    guest.vm.provision "shell", name: "DNS SERVER", path: "enable-bind9.sh", args: "#{DNSIP} #{DOMAIN}"
   end
 
   # services 
@@ -64,8 +64,9 @@ Vagrant.configure("2") do |config|
         subconfig.vm.network :private_network, ip: info[:ip], virtualbox__intnet: VBNET
         subconfig.vm.network :private_network, ip: info[:ip2]
       end
-      guest.vm.provision "shell", name: "dns-client \##{idx}", inline: $dnsclient, args: "#{DNSIP} #{DOMAIN}"
-      guest.vm.provision "shell", name: "#{hostname}:#{info[:port]}", inline: info[:provision], args:  "#{hostname} #{DOMAIN}"
+      guest.vm.provision "shell", name: "DNS CLIENTE \##{idx}", inline: $dnsclient, args: "#{DNSIP} #{DOMAIN}"
+      guest.vm.provision "shell", name: "INSTALL SERVICE #{hostname}", inline: info[:install], args: "#{hostname} #{DOMAIN}"
+      guest.vm.provision "shell", name: "CONFIG SERVICE #{hostname}", path: info[:provision], args: "#{idx} #{info[:ip]} #{info[:ip2]} #{DOMAIN}"
       guest.vm.network "forwarded_port", guest: 80, host: info[:port]
     end 
   end
