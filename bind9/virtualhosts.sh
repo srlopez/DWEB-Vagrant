@@ -48,9 +48,11 @@ Listen 8080
 </VirtualHost>
 # Discriminamos por IP
 <VirtualHost $IP1:8080>
+  ServerName $IP1:8080
   DocumentRoot "/var/www/192"
 </VirtualHost>
 <VirtualHost $IP2:8080>
+  ServerName $IP2:8080
   DocumentRoot "/var/www/10"
 </VirtualHost>
 EOF
