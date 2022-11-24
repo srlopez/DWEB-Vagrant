@@ -72,3 +72,12 @@ y probamos que funciona
 4. 
 Configuramos para cliente, un dns, dos apaches, y un nginx
 Trabajo de alumno
+
+Nota: el servicio "systemd-resolved" lo hem,os de para y desactivar. En caso contrario sobre escribe /etc/resolv.conf cada reinicio
+Se ha de crear un script para configurarlo
+
+systemctl disable systemd-resolved
+systemctl stop systemd-resolved
+rm /etc/resolv.conf
+echo "nameserver 192.168.1.2\ndomain aual104.local">/etc/resolv.conf
+

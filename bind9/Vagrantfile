@@ -11,6 +11,9 @@ DNSIP  = "#{RED}.2"
 
 $dnsclient = <<-SHELL
   # apt-get update
+  systemctl disable systemd-resolved
+  systemctl stop systemd-resolved
+  rm /etc/resolv.conf
   echo "nameserver $1\ndomain $2">/etc/resolv.conf
 SHELL
 
@@ -35,9 +38,9 @@ services = {
 Vagrant.configure("2") do |config|
   # config general
   config.vm.box = BOX_SERVER
-  #if Vagrant.has_plugin?("vagrant-vbguest")
-    # config.vbguest.auto_update = false
-  #end
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
+  end
 
   config.vm.provider "virtualbox" do |vb|
     vb.cpus = 1
@@ -53,6 +56,7 @@ Vagrant.configure("2") do |config|
       subconfig.vm.network :private_network, ip: DNSIP,  virtualbox__intnet: VBNET 
     end
     guest.vm.provision "shell", name: "DNS SERVER", path: "enable-bind9.sh", args: "#{DNSIP} #{DOMAIN}"
+    guest.vm.provision "shell", name: "DNS CLIENTE", inline: $dnsclient, args: "127.0.0.1 #{DOMAIN}"
   end
 
   # services 
@@ -81,7 +85,9 @@ Vagrant.configure("2") do |config|
           vb.cpus = 2
           vb.memory = 2048
           subconfig.vm.box = BOX_DESKTOP
-          #subconfig.vbguest.auto_update = true
+          if Vagrant.has_plugin?("vagrant-vbguest")
+            config.vbguest.auto_update = true
+          end
         end
         subconfig.vm.hostname = "client#{id}.#{DOMAIN}"
         subconfig.vm.network :private_network, ip: "#{RED}.#{100+id}",  virtualbox__intnet: VBNET

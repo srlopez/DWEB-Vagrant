@@ -53,6 +53,8 @@ ns.$ZONA.       IN      A       $DNSIP
 nginx           IN      A       $DIR.10
 apache1.$ZONA.  IN      A       $DIR.11
 apache2         IN      A       $DIR.12
+ap1             IN      A       10.0.0.11
+ap2             IN      A       10.0.0.12
 
 ; Registros ALIAS FQDN y no FQDN
 sv1             IN      CNAME   apache1
@@ -81,14 +83,18 @@ $REV.in-addr.arpa.  IN      NS      ns.$ZONA.
 12  IN  PTR apache2
 EOF
 
-cp /etc/resolv.conf{,.bak}
-cat <<EOF >/etc/resolv.conf
-nameserver 127.0.0.1
-domain $ZONA
-EOF
-
 named-checkconf
 named-checkconf /etc/bind/named.conf.options
 named-checkzone $ZONA /var/lib/bind/$ZONA
 named-checkzone $REV.in-addr.arpa /var/lib/bind/$DIR.rev
-sudo systemctl restart bind9
+
+# systemctl disable systemd-resolved
+# systemctl stop systemd-resolved
+# rm /etc/resolv.conf
+# cat <<EOF >/etc/resolv.conf
+# nameserver 127.0.0.1
+# domain $ZONA
+# EOF
+
+
+systemctl restart bind9
