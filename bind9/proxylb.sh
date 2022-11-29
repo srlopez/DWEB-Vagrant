@@ -1,10 +1,10 @@
 # Documentación de Forwarded
 # https://codingshower.com/apache-server-get-actual-client-ip-address-behind-proxy-or-load-balancer/
-
+# https://www.purocodigo.net/articulo/balanceo-de-carga-de-alto-rendimiento-con-nginx 
 cat <<EOF >/etc/nginx/sites-available/000-default
 # Pasamos la dirección del cliente
 proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-upstream MisBALANCEADOS {
+upstream mismaquinas {
     # Con propósitos educativos
     # Los servidores deberían proveer el mismo servico
     server apache1.aula104.local;
@@ -20,7 +20,7 @@ server {
 
     # En / redirijo a los servidores de carga
     location / {
-        proxy_pass http://MisBALANCEADOS;
+        proxy_pass http://mismaquinas;
     }
 
     # Proxy inverso a apache1 en /uno
