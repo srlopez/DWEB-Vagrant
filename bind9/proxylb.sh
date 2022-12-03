@@ -93,4 +93,4 @@ ln -s ../sites-available/000-default
 nginx -t
 systemctl restart nginx
 curl -s -D - -o /dev/null http://localhost/
-curl -L http://localhost/
+curl -s -L http://localhost/que
