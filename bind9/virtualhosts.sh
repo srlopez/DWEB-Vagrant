@@ -29,6 +29,10 @@ cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/00
 cat <<EOF >/etc/apache2/sites-available/000-default.conf
 # Discriminamos por ServerName
 <VirtualHost *:80>
+  DocumentRoot "/var/www/80"
+  ServerName $DOM
+</VirtualHost>
+<VirtualHost *:80>
   DocumentRoot "/var/www/apache"
   ServerAlias apache$ID.$DOM
   ServerName apache$ID
@@ -38,14 +42,15 @@ cat <<EOF >/etc/apache2/sites-available/000-default.conf
   ServerAlias sv$ID.$DOM
   ServerName sv$ID
 </VirtualHost>
-<VirtualHost *:80>
-  DocumentRoot "/var/www/80"
-  ServerName $DOM
-</VirtualHost>
+
 
 # Lo que venga por IP:8080
 Listen 8080
 # Discriminamos por IP
+<VirtualHost *:8080>
+  DocumentRoot "/var/www/8080"
+  ServerName $DOM:8080
+</VirtualHost>
 <VirtualHost $IP1:8080>
   ServerName $IP1:8080
   ServerAlias $IP1:8080
@@ -56,14 +61,12 @@ Listen 8080
   ServerAlias $IP2:8080
   DocumentRoot "/var/www/10"
 </VirtualHost>
-<VirtualHost *:8080>
-  DocumentRoot "/var/www/8080"
-</VirtualHost>
 EOF
 
 # Creamos los directorios de las aplicaciones
 # todos igual ya que variaran a la hora de mostrar la información
 cd /var/www/
+rm 80 apache sv 8080 10 192 
 ln -s html 80
 ln -s html apache
 ln -s html sv
