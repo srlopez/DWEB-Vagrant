@@ -4,7 +4,7 @@
 cat <<EOF >/etc/nginx/sites-available/000-default
 # Pasamos la dirección del cliente
 proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-upstream mismaquinas {
+upstream api {
     # Con propósitos educativos
     # Los servidores deberían proveer el mismo servico
     server apache1.aula104.local;
@@ -18,9 +18,9 @@ upstream mismaquinas {
 server {
     listen 80;
 
-    # En / redirijo a los servidores de carga
-    location / {
-        proxy_pass http://mismaquinas;
+    # En /api redirijo a los servidores de carga
+    location /api {
+        proxy_pass http://api;
     }
 
     # Proxy inverso a apache1 en /uno
@@ -32,6 +32,18 @@ server {
     location /dos {
         proxy_pass http://apache2/;
     }
+
+    # Redirección por reescritura de url
+    location /subdomain.apache1.aula104.local {
+        rewrite ^/(.*)$ http://localhost/uno redirect;
+    }
+
+    # Redirección por reescritura de url
+    location / {
+        rewrite ^/(.*)$ https://apache1.aula105.local/$1 redirect;
+    }
+
+    
 }
 EOF
 

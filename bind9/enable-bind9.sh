@@ -38,7 +38,7 @@ EOF
 
 cat <<EOF >/var/lib/bind/$ZONA
 \$TTL 3600      ; Este es el tiempo, en segundos, que un registro de recurso de zona es válido
-$ZONA.     IN      SOA     ns.$ZONA. santi.$ZONA. (
+@               IN      SOA     ns.$ZONA. santi.$ZONA. (
     3           ; n <serial-number> Un valor incrementado cada vez que se cambia el archivo de zona 
     7200        ; 2 horas <time-to-refresh> tiempo de espera de un esclavo antes de preguntar al maestro si se han realizado cambios
     3600        ; 1 hora <time-to-retry>  tiempo de espera antes de emitir una petición de actualización, si el maestro no responde.
@@ -46,23 +46,41 @@ $ZONA.     IN      SOA     ns.$ZONA. santi.$ZONA. (
     86400 )     ; 1 día <minimum-TTL> Tiempo que otros servidores de nombres guardan en caché la información de zona.
 
 ; Registro NameServer de la zona, el cual anuncia los nombres de servidores con autoridad.
-$ZONA.          IN      NS      ns.$ZONA. ; debe ser un FQDN.
+@               IN      NS      ns1.$ZONA. ; debe ser un FQDN, y podemos quitar la @
+                IN      NS      ns2.$ZONA.
 
 ; Registros Address FQDN y no FQDN
-ns.$ZONA.       IN      A       $DNSIP
-nginx           IN      A       $DIR.10
-apache1.$ZONA.  IN      A       $DIR.11
-apache2         IN      A       $DIR.12
+ns1             IN      A       192.168.1.2
+ns2             IN      A       192.168.1.2
+nginx           IN      A       192.168.1.10
+apache1         IN      A       192.168.1.11
+@               IN      A       192.168.1.11
+apache2         IN      A       192.168.1.12
 ap1             IN      A       10.0.0.11
 ap2             IN      A       10.0.0.12
+*               IN      A       10.0.0.12
 
-; Registros ALIAS FQDN y no FQDN
+; Registros Address no FQDN
+ns1             IN      A       192.168.1.2
+ns2             IN      A       192.168.1.2
+nginx           IN      A       192.168.1.10
+apache1         IN      A       192.168.1.11
+@               IN      A       192.168.1.11
+apache2         IN      A       192.168.1.12
+ap1             IN      A       10.0.0.11
+ap2             IN      A       10.0.0.12
+*               IN      A       10.0.0.12 ; resolvemos subdominios
+
+; Registros ALIAS no FQDN
 sv1             IN      CNAME   apache1
 sv2             IN      CNAME   apache2
-ns1.$ZONA.      IN      CNAME   ns
-ns2.$ZONA.      IN      CNAME   ns
+ns              IN      CNAME   ns1
 proxy           IN      CNAME   nginx
 balancer        IN      CNAME   nginx
+
+; ejemplos FQDN
+www.$ZONA.    IN CNAME apache1
+admin.$ZONA.   IN A 10.0.0.11
 EOF
 
 cat <<EOF >/var/lib/bind/$DIR.rev
