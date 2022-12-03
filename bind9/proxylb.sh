@@ -56,13 +56,13 @@ server {
     # curl -s -D - -o /dev/null http://localhost/
     # curl -L http://localhost/
     location  = / {
-       rewrite ^/(.*)$ http://aula104.local/ permanent;
+       rewrite ^/(.*)\$ http://aula104.local/ permanent;
     }
 
     # Redirección por reescritura absoluta de url host de aula104.local
     # curl http://localhost/goto/(host)
     location /goto/ {
-        rewrite ^/goto/(.*)$ http://$1.aula104.local redirect;
+        rewrite ^/goto/(.*)\$ http://\$1.aula104.local redirect;
     }
 
     # Redirección por reescritura relativa de url (local)
@@ -71,7 +71,7 @@ server {
     # curl -L -D - http://localhost/local/pepe # 404
     # curl -L -D - http://localhost/local/dos # 200
     location /local/ {
-        rewrite ^/local/(.*)$ /$1 redirect;
+        rewrite ^/local/(.*)\$ /\$1 redirect;
     }
 
     # Caemos aquí por defecto
@@ -79,9 +79,9 @@ server {
     # muestra el index de root
     # tiene que haber directiva root e index
     location / {
-        if (!-e $request_filename){
-           # rewrite ^(.*)$ /index.html break;
-           rewrite ^(.*)$ / break;
+        if (!-e \$request_filename){
+           # rewrite ^(.*)\$ /index.html break;
+           rewrite ^(.*)\$ / break;
         }
     }
 }
