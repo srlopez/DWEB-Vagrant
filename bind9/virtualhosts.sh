@@ -19,7 +19,7 @@ cat <<EOF >/var/www/html/index.php
 "REMOTE_ADDR     ".\$_SERVER['REMOTE_ADDR']."\n".
 "X_FORWARDED_FOR ".\$_SERVER['HTTP_X_FORWARDED_FOR']."\n".
 "The time is     " . date("h:i:sa")."\n";
-// 
+// foreach(\$_SERVER as \$key => \$value) print \$key."=".\$value."\n";
 ?>
 </pre>
 EOF
