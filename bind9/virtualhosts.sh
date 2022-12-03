@@ -18,7 +18,8 @@ cat <<EOF >/var/www/html/index.php
 "SCRIPT_FILENAME ".\$_SERVER['SCRIPT_FILENAME']."\n".
 "REMOTE_ADDR     ".\$_SERVER['REMOTE_ADDR']."\n".
 "X_FORWARDED_FOR ".\$_SERVER['HTTP_X_FORWARDED_FOR']."\n".
-"The time is     " . date("h:i:sa")."\n"
+"The time is     " . date("h:i:sa")."\n";
+// 
 ?>
 </pre>
 EOF
