@@ -49,29 +49,18 @@ cat <<EOF >/var/lib/bind/$ZONA
 @               IN      NS      ns1.$ZONA. ; debe ser un FQDN, y podemos quitar la @
                 IN      NS      ns2.$ZONA.
 
-; Registros Address FQDN y no FQDN
+; Registros Address
 ns1             IN      A       192.168.1.2
 ns2             IN      A       192.168.1.2
 nginx           IN      A       192.168.1.10
+@               IN      A       192.168.1.11 ; $ZONA
 apache1         IN      A       192.168.1.11
-@               IN      A       192.168.1.11
-apache2         IN      A       192.168.1.12
-ap1             IN      A       10.0.0.11
-ap2             IN      A       10.0.0.12
-*               IN      A       10.0.0.12
-
-; Registros Address no FQDN
-ns1             IN      A       192.168.1.2
-ns2             IN      A       192.168.1.2
-nginx           IN      A       192.168.1.10
-apache1         IN      A       192.168.1.11
-@               IN      A       192.168.1.11
 apache2         IN      A       192.168.1.12
 ap1             IN      A       10.0.0.11
 ap2             IN      A       10.0.0.12
 *               IN      A       10.0.0.12 ; resolvemos subdominios
 
-; Registros ALIAS no FQDN
+; Registros ALIAS
 sv1             IN      CNAME   apache1
 sv2             IN      CNAME   apache2
 ns              IN      CNAME   ns1
@@ -79,8 +68,8 @@ proxy           IN      CNAME   nginx
 balancer        IN      CNAME   nginx
 
 ; ejemplos FQDN
-www.$ZONA.    IN CNAME apache1
-admin.$ZONA.   IN A 10.0.0.11
+www.$ZONA.      IN      CNAME   apache1
+admin.$ZONA.    IN      A       10.0.0.11
 EOF
 
 cat <<EOF >/var/lib/bind/$DIR.rev
