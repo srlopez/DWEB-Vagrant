@@ -29,32 +29,35 @@ cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/00
 cat <<EOF >/etc/apache2/sites-available/000-default.conf
 # Discriminamos por ServerName
 <VirtualHost *:80>
+  DocumentRoot "/var/www/apache"
+  ServerAlias apache$ID.$DOM
+  ServerName apache$ID
+</VirtualHost>
+<VirtualHost *:80>
+  DocumentRoot "/var/www/sv"
+  ServerAlias sv$ID.$DOM
+  ServerName sv$ID
+</VirtualHost>
+<VirtualHost *:80>
   DocumentRoot "/var/www/80"
-</VirtualHost>
-<VirtualHost *:80>
-  DocumentRoot "/var/www/apache$ID"
-  ServerName apache$ID.$DOM
-  ServerAlias apache$ID
-</VirtualHost>
-<VirtualHost *:80>
-  DocumentRoot "/var/www/sv$ID"
-  ServerName sv$ID.$DOM
-  ServerAlias sv$ID
+  ServerName $DOM
 </VirtualHost>
 
 # Lo que venga por IP:8080
 Listen 8080
-<VirtualHost *:8080>
-  DocumentRoot "/var/www/8080"
-</VirtualHost>
 # Discriminamos por IP
 <VirtualHost $IP1:8080>
   ServerName $IP1:8080
+  ServerAlias $IP1:8080
   DocumentRoot "/var/www/192"
 </VirtualHost>
 <VirtualHost $IP2:8080>
   ServerName $IP2:8080
+  ServerAlias $IP2:8080
   DocumentRoot "/var/www/10"
+</VirtualHost>
+<VirtualHost *:8080>
+  DocumentRoot "/var/www/8080"
 </VirtualHost>
 EOF
 
@@ -62,8 +65,8 @@ EOF
 # todos igual ya que variaran a la hora de mostrar la información
 cd /var/www/
 ln -s html 80
-ln -s html apache$ID
-ln -s html sv$ID
+ln -s html apache
+ln -s html sv
 ln -s html 8080
 ln -s html 10
 ln -s html 192
