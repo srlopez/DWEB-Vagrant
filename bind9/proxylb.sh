@@ -4,10 +4,10 @@
 echo "<h1>Nginx como proxy inverso y balanceador de carga</h>">/var/www/html/index.html
 cat <<EOF >/etc/nginx/sites-available/000-default
 # Pasamos la dirección del cliente
-proxy_set_header Host i\$host;
-proxy_set_header X-Real-IP \$remote_addr;
+# proxy_set_header Host \$host;
+# proxy_set_header X-Real-IP \$remote_addr;
 proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for; # La IP Cliente
-proxy_set_header X-Forwarded-Proto \$scheme;
+# proxy_set_header X-Forwarded-Proto \$scheme;
 
 upstream misapis {
     # Con propósitos educativos
@@ -37,7 +37,7 @@ server {
     # En /api/ redirijo a los servidores de carga
     # curl -D - http://localhost/api 301
     # curl -D - http://localhost/api/ 200
-    # curl -D - http://localhost/api/1 400
+    # curl -D - http://localhost/api/1 404
     location /api/ {
         proxy_pass http://misapis/;
     }
@@ -53,8 +53,8 @@ server {
     }
 
     # Redirección por 301 al dominio general
-    # curl -s -D - -o /dev/null http://localhost/
-    # curl -L http://localhost/
+    # curl -s -D - -o /dev/null http://nginx/
+    # curl -L http://nginx/
     location  = / {
        rewrite ^/(.*)\$ http://aula104.local/ permanent;
     }
@@ -67,9 +67,9 @@ server {
 
     # Redirección por reescritura relativa de url (local)
     # curl http://localhost/local/(path)
-    # curl -D - http://localhost/local/pepe # 302
-    # curl -L -D - http://localhost/local/pepe # 404
-    # curl -L -D - http://localhost/local/dos # 200
+    # curl -D - http://localhost/local/pepe # 302 Moved Temporarily
+    # curl -L -D - http://localhost/local/pepe # Redirige a la siguiente
+    # curl -L -D - http://localhost/local/dos # 200 /api /uno /dos
     location /local/ {
         rewrite ^/local/(.*)\$ /\$1 redirect;
     }
@@ -78,10 +78,11 @@ server {
     # y para cualquier otra cosa  que no exista,
     # muestra el index de root
     # tiene que haber directiva root e index
+    # curl -L -D - nginx/local/index.nginx-debian.html # 302 200
     location / {
         if (!-e \$request_filename){
            # rewrite ^(.*)\$ /index.html break;
-           rewrite ^(.*)\$ / break;
+           rewrite ^(.*)\$ / break; # a la primera de la directiva index
         }
     }
 }

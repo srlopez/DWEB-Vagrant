@@ -70,6 +70,8 @@ balancer        IN      CNAME   nginx
 ; ejemplos FQDN
 www.$ZONA.      IN      CNAME   apache1
 admin.$ZONA.    IN      A       10.0.0.11
+www2.$ZONA.     IN      CNAME   apache2
+admin2.$ZONA.   IN      A       10.0.0.12
 EOF
 
 cat <<EOF >/var/lib/bind/$DIR.rev

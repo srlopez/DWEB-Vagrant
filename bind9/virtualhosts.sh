@@ -27,52 +27,47 @@ EOF
 # Preparamos la configuración de hosts
 cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.org
 cat <<EOF >/etc/apache2/sites-available/000-default.conf
-# Discriminamos por ServerName
-<VirtualHost *:80>
-  DocumentRoot "/var/www/80"
-  ServerName $DOM
-</VirtualHost>
+# Discriminamos por ServerAlias
 <VirtualHost *:80>
   DocumentRoot "/var/www/apache"
   ServerAlias apache$ID.$DOM
-  ServerName apache$ID
 </VirtualHost>
 <VirtualHost *:80>
   DocumentRoot "/var/www/sv"
   ServerAlias sv$ID.$DOM
-  ServerName sv$ID
 </VirtualHost>
-
-
+<VirtualHost *:80>
+  DocumentRoot "/var/www/80"
+  ServerAlias *
+</VirtualHost>
 # Lo que venga por IP:8080
 Listen 8080
 # Discriminamos por IP
-<VirtualHost *:8080>
-  DocumentRoot "/var/www/8080"
-  ServerName $DOM:8080
-</VirtualHost>
 <VirtualHost $IP1:8080>
-  ServerName $IP1:8080
-  ServerAlias $IP1:8080
   DocumentRoot "/var/www/192"
 </VirtualHost>
 <VirtualHost $IP2:8080>
-  ServerName $IP2:8080
-  ServerAlias $IP2:8080
   DocumentRoot "/var/www/10"
+</VirtualHost>
+# Nada entra por aquí
+# Se redirigen según la IP anterior que resuelva
+<VirtualHost *:8080>
+  DocumentRoot "/var/www/8080"
+  ServerAlias *
 </VirtualHost>
 EOF
 
 # Creamos los directorios de las aplicaciones
 # todos igual ya que variaran a la hora de mostrar la información
 cd /var/www/
-rm 80 apache sv 8080 10 192 
-ln -s html 80
+rm apache sv 80 192 10 8080
 ln -s html apache
 ln -s html sv
-ln -s html 8080
-ln -s html 10
+ln -s html 80
 ln -s html 192
+ln -s html 10
+ln -s html 8080
+
 systemctl restart apache2
 curl -s apache$ID
 curl -s $IP2:8080
