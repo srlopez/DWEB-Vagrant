@@ -1,4 +1,6 @@
 GUION DE TRABAJO
+https://learn.microsoft.com/en-us/windows/terminal/tutorials/new-tab-same-directory
+
 1. vagrant
 https://docs.google.com/document/d/1y8Dsjl1CHolYP_boMN9U-6X0gTkcwU8nAihCVMyLOVE/edit?usp=sharing
 
